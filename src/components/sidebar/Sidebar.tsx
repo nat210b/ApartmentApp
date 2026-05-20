@@ -35,7 +35,7 @@ export function Sidebar() {
                 <h5>Room Management</h5>
             </div>
             {menu.map((item) => (
-                <NavLink
+                <NavLink 
                     key={item.link}
                     className={({ isActive }) => `menuItem ${isActive ? 'active' : ''}`}
                     to={item.link}

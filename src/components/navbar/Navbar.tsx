@@ -47,8 +47,7 @@ export default function Navbar() {
     return (
         <nav className="navbar bg-white border-bottom px-4 py-2">
             <div className="container-fluid px-0">
-                <span className="navbar-brand mb-0 h6">Apartment App</span>
-
+                <div></div>
                 <div className="d-flex align-items-center ms-auto" style={{ gap: "12px" }}>
                     {loading ? (
                         <span className="text-muted small">Loading...</span>

@@ -54,7 +54,7 @@ export default function RoomForm({ room, saving = false, onCancel, onSubmit }: R
     }, [room]);
 
     function handleInputChange(
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     ) {
         const { name, value } = e.target;
         setFormValues((currentValues) => ({
@@ -160,6 +160,22 @@ export default function RoomForm({ room, saving = false, onCancel, onSubmit }: R
                             value={formValues.Quota}
                             onChange={handleInputChange}
                         />
+                    </div>
+                    <div className="col-md-4 mb-3">
+                        <label htmlFor="roomStatus" className="form-label">Status</label>
+                        <select
+                            id="roomStatus"
+                            name="Status"
+                            className="form-control"
+                            value={formValues.Status}
+                            onChange={handleInputChange}
+                            required
+                        >
+                            <option value="Available">Available</option>
+                            <option value="Occupied">Occupied</option>
+                            <option value="Reserved">Reserved</option>
+                            <option value="Maintenance">Maintenance</option>
+                        </select>
                     </div>
                 </div>
 

@@ -1,5 +1,7 @@
 .sidebar {
     background-color: var(--bs-primary, #0d6efd);
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .menuItem {
@@ -8,6 +10,7 @@
     color: #d1d5db;
     text-decoration: none;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .menuItem:hover {

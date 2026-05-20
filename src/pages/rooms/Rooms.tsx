@@ -104,113 +104,117 @@ export default function Rooms() {
 
     return (
         <div className="container-fluid">
-            <div className="d-flex flex-row justify-content-between align-items-center mb-4 ">
-                <h1 className="pb-2">Rooms</h1>
-                <button type="button" className="btn btn-primary" onClick={openAddRoomModal}>
-                    Add Room
-                </button>
-            </div>
+            <div className="mx-auto" style={{ maxWidth: "820px" }}>
+                <div className="d-flex flex-row justify-content-between align-items-center mb-4">
+                    <h1 className="pb-2 mb-0">Rooms</h1>
+                    <button type="button" className="btn btn-primary" onClick={openAddRoomModal}>
+                        Add Room
+                    </button>
+                </div>
 
-            <div className="card">
-                <div className="d-flex justify-content-between align-items-center p-2">
-                    <div className="d-flex" style={{ gap: "10px" }}>
-                        {roomStatusFilters.map((status) => (
-                            <button
-                                key={status}
-                                type="button"
-                                className={`btn ${statusFilter === status ? 'btn-primary' : 'btn-outline-secondary'}`}
-                                onClick={() => handleStatusFilterChange(status)}
-                            >
-                                {status} ({status === 'All' ? rooms.length : rooms.filter((room) => room.Status === status).length})
-                            </button>
-                        ))}
-                    </div>
-                    <div className="d-flex p-2">
-                        <div>
-                            <button className="btn btn-outline-secondary">Export</button>
+                <div className="card">
+                    <div className="d-flex justify-content-between align-items-center p-2">
+                        <div className="d-flex flex-wrap" style={{ gap: "10px" }}>
+                            {roomStatusFilters.map((status) => (
+                                <button
+                                    key={status}
+                                    type="button"
+                                    className={`btn ${statusFilter === status ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                    onClick={() => handleStatusFilterChange(status)}
+                                >
+                                    {status} ({status === 'All' ? rooms.length : rooms.filter((room) => room.Status === status).length})
+                                </button>
+                            ))}
+                        </div>
+                        <div className="d-flex p-2">
+                            <div>
+                                <button className="btn btn-outline-secondary">Export</button>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
-            </div>
-
-            <div className="room-table-wrapper mt-3">
-                <table className="table mb-0">
-                    <thead className="bg-secondary text-white">
-                        <tr className="text-center">
-                            <th>Room</th>
-                            <th>Type</th>
-                            <th>Price</th>
-                            <th>Status</th>
-                            <th className="w-25"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {loading ? (
+                <div className="room-table-wrapper mt-3 overflow-hidden border rounded">
+                    <table className="table mb-0">
+                        <thead className="bg-secondary text-white">
                             <tr className="text-center">
-                                <td colSpan={5} className="py-4 text-muted">
-                                    Loading rooms...
-                                </td>
+                                <th>Room</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th className="w-25"></th>
                             </tr>
-                        ) : errorMessage ? (
-                            <tr className="text-center">
-                                <td colSpan={5} className="py-4 text-danger">
-                                    {errorMessage}
-                                </td>
-                            </tr>
-                        ) : visibleRooms.length > 0 ? (
-                            visibleRooms.map((room) => (
-                                <tr className="text-center" key={room.ID ?? room.Number}>
-                                    <td>{room.Number}</td>
-                                    <td>{room.Type}</td>
-                                    <td>{room.Rental_Fee}</td>
-                                    <td>{room.Status}</td>
-                                    <td className="d-flex justify-content-end">
-                                        <button className="btn btn-secondary" onClick={() => openEditRoomModal(room)}>Edit</button>
-                                        <button className="btn btn-danger">Delete</button>
+                        </thead>
+                        <tbody>
+                            {loading ? (
+                                <tr className="text-center">
+                                    <td colSpan={5} className="py-4 text-muted">
+                                        Loading rooms...
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr className="text-center">
-                                <td colSpan={5} className="py-4 text-muted">
-                                    No rooms found.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            <div className="d-flex justify-content-between align-items-center mt-3">
-                <div className="d-flex align-items-center">
-                    <select name="pageSize" id="pageSize" value={pageSize} onChange={handlePageSizeChange} className="form-control w-auto">
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="5">5</option>
-                    </select>
+                            ) : errorMessage ? (
+                                <tr className="text-center">
+                                    <td colSpan={5} className="py-4 text-danger">
+                                        {errorMessage}
+                                    </td>
+                                </tr>
+                            ) : visibleRooms.length > 0 ? (
+                                visibleRooms.map((room) => (
+                                    <tr className="text-center" key={room.ID ?? room.Number}>
+                                        <td>{room.Number}</td>
+                                        <td>{room.Type}</td>
+                                        <td>{room.Rental_Fee}</td>
+                                        <td>{room.Status}</td>
+                                        <td>
+                                            <div className="d-flex justify-content-end" style={{ gap: "4px" }}>
+                                                <button className="btn btn-secondary" onClick={() => openEditRoomModal(room)}>Edit</button>
+                                                <button className="btn btn-danger">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr className="text-center">
+                                    <td colSpan={5} className="py-4 text-muted">
+                                        No rooms found.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
+                    </table>
                 </div>
 
-                <div className="d-flex align-items-center">
-                    <button className="btn btn-outline-secondary mr-2" disabled={currentPage === 1} onClick={() => goToPage(currentPage - 1)}>
-                        Prev
-                    </button>
-                    {Array.from({ length: totalPages }, (_, index) => {
-                        const page = index + 1;
+                <div className="d-flex justify-content-between align-items-center mt-3" style={{ gap: "8px" }}>
+                    <div className="d-flex align-items-center flex-grow-1">
+                        <select name="pageSize" id="pageSize" value={pageSize} onChange={handlePageSizeChange} className="form-control">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
 
-                        return (
-                            <button
-                                key={page}
-                                className={`btn mr-2 ${page === currentPage ? 'btn-primary' : 'btn-outline-secondary'}`}
-                                onClick={() => goToPage(page)}
-                            >
-                                {page}
-                            </button>
-                        );
-                    })}
-                    <button className="btn btn-outline-secondary" disabled={currentPage >= totalPages} onClick={() => goToPage(currentPage + 1)}>
-                        Next
-                    </button>
+                    <div className="d-flex align-items-center" style={{ gap: "4px" }}>
+                        <button className="btn btn-outline-secondary" disabled={currentPage === 1} onClick={() => goToPage(currentPage - 1)}>
+                            Prev
+                        </button>
+                        {Array.from({ length: totalPages }, (_, index) => {
+                            const page = index + 1;
+
+                            return (
+                                <button
+                                    key={page}
+                                    className={`btn ${page === currentPage ? 'btn-primary' : 'btn-outline-secondary'}`}
+                                    onClick={() => goToPage(page)}
+                                >
+                                    {page}
+                                </button>
+                            );
+                        })}
+                        <button className="btn btn-outline-secondary" disabled={currentPage >= totalPages} onClick={() => goToPage(currentPage + 1)}>
+                            Next
+                        </button>
+                    </div>
                 </div>
             </div>
 
