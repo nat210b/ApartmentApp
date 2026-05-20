@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Dashboard from './dashboard/Dashboard'
 import Rooms from './rooms/Rooms'
 import Tenants from './tenants/Tenants'
@@ -18,10 +18,14 @@ import Payroll from './payroll/Payroll'
 import Documents from './documents/Documents'
 import Users from './users/Users'
 import Settings from './settings/Settings'
+import Login from './auth/Login'
 
 export default function App() {
+  const location = useLocation()
+  const isLoginPage = location.pathname === '/login'
+
   return (
-    <div className='w-100 p-4 bg-light'>
+    <div className={`w-100 bg-light ${isLoginPage ? '' : 'p-4'}`}>
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/rooms" element={<Rooms />} />
@@ -42,6 +46,7 @@ export default function App() {
         <Route path="/documents" element={<Documents />} />
         <Route path="/users" element={<Users />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </div>
   )

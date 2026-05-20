@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { getRooms } from "../../services/rooms/RoomServices";
+import RoomForm from "./RoomForm";
+import {
+    createRoom,
+    getRooms,
+    updateRoom,
+    type CreateRoomInput,
+    type UpdateRoomInput,
+} from "../../services/rooms/RoomServices";
 import type { Room } from "../../schemas/Room";
 type RoomStatus = 'All' | 'Available' | 'Occupied' | 'Reserved' | 'Maintenance';
 
@@ -12,6 +19,9 @@ export default function Rooms() {
     const [pageSize, setPageSize] = useState(3);
     const [currentPage, setCurrentPage] = useState(1);
     const [statusFilter, setStatusFilter] = useState<RoomStatus>('All');
+    const [showAddRoomModal, setShowAddRoomModal] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+    const [savingRoom, setSavingRoom] = useState(false);
 
     useEffect(() => {
         async function fetchRooms() {
@@ -54,12 +64,53 @@ export default function Rooms() {
         setCurrentPage(page);
     }
 
+    function openAddRoomModal() {
+        setSelectedRoom(null);
+        setShowAddRoomModal(true);
+    }
+
+    function openEditRoomModal(room: Room) {
+        setSelectedRoom(room);
+        setShowAddRoomModal(true);
+    }
+
+    function closeRoomModal() {
+        setShowAddRoomModal(false);
+        setSelectedRoom(null);
+    }
+
+    async function handleSaveRoom(roomInput: CreateRoomInput | UpdateRoomInput) {
+        try {
+            setSavingRoom(true);
+
+            if (selectedRoom?.ID) {
+                const updatedRoom = await updateRoom(selectedRoom.ID, roomInput);
+                setRooms((currentRooms) =>
+                    currentRooms.map((room) => room.ID === updatedRoom.ID ? updatedRoom : room),
+                );
+            } else {
+                const createdRoom = await createRoom(roomInput as CreateRoomInput);
+                setRooms((currentRooms) => [createdRoom, ...currentRooms]);
+            }
+
+            closeRoomModal();
+        } catch (error) {
+            console.error(error);
+            setErrorMessage('Unable to save room.');
+        } finally {
+            setSavingRoom(false);
+        }
+    }
+
     return (
         <div className="container-fluid">
             <div className="d-flex flex-row justify-content-between align-items-center mb-4 ">
                 <h1 className="pb-2">Rooms</h1>
-                <button type="button" className="btn btn-primary">Add Room</button>
+                <button type="button" className="btn btn-primary" onClick={openAddRoomModal}>
+                    Add Room
+                </button>
             </div>
+
             <div className="card">
                 <div className="d-flex justify-content-between align-items-center p-2">
                     <div className="d-flex" style={{ gap: "10px" }}>
@@ -115,7 +166,7 @@ export default function Rooms() {
                                     <td>{room.Rental_Fee}</td>
                                     <td>{room.Status}</td>
                                     <td className="d-flex justify-content-end">
-                                        <button className="btn btn-secondary">Edit</button>
+                                        <button className="btn btn-secondary" onClick={() => openEditRoomModal(room)}>Edit</button>
                                         <button className="btn btn-danger">Delete</button>
                                     </td>
                                 </tr>
@@ -162,6 +213,24 @@ export default function Rooms() {
                     </button>
                 </div>
             </div>
+
+            {showAddRoomModal && (
+                <>
+                    <div className="modal fade show d-block" tabIndex={-1} role="dialog" aria-modal="true">
+                        <div className="modal-dialog modal-dialog-centered">
+                            <div className="modal-content">
+                                <RoomForm
+                                    room={selectedRoom}
+                                    saving={savingRoom}
+                                    onCancel={closeRoomModal}
+                                    onSubmit={handleSaveRoom}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="modal-backdrop fade show" onClick={closeRoomModal} />
+                </>
+            )}
         </div>
     );
 }
