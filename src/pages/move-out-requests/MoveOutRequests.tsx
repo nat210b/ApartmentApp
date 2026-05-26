@@ -1,6 +1,7 @@
 export default function MoveOutRequests() {
     return (
-        <div className="container">
+        <div className="container-fluid">
+            <div className="mx-auto" style={{ maxWidth: "820px" }}>
             <div className="d-flex flex-row justify-content-between align-items-center mb-4">
                 <h1 className="pb-2">Move-out Requests</h1>
                 <button type="button" className="btn btn-primary">Add Request</button>
@@ -32,6 +33,7 @@ export default function MoveOutRequests() {
                         </tr>
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     );

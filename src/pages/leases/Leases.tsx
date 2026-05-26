@@ -27,7 +27,8 @@ export default function Leases() {
     }
 
     return (
-        <div className="container">
+        <div className="container-fluid">
+            <div className="mx-auto" style={{ maxWidth: "820px" }}>
             <div className="d-flex flex-row justify-content-between align-items-center mb-4">
                 <h1 className="pb-2">Lease Agreements</h1>
                 <button type="button" className="btn btn-primary">Add Lease</button>
@@ -78,6 +79,7 @@ export default function Leases() {
                     })}
                     <button className="btn btn-outline-secondary" disabled={currentPage === totalPages} onClick={() => goToPage(currentPage + 1)}>Next</button>
                 </div>
+            </div>
             </div>
         </div>
     );

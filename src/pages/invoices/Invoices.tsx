@@ -1,6 +1,7 @@
 export default function Invoices() {
     return (
-        <div className="container">
+        <div className="container-fluid">
+            <div className="mx-auto" style={{ maxWidth: "820px" }}>
             <div className="d-flex flex-row justify-content-between align-items-center mb-4">
                 <h1 className="pb-2">Invoices</h1>
                 <button type="button" className="btn btn-primary">Create Invoice</button>
@@ -32,6 +33,7 @@ export default function Invoices() {
                         </tr>
                     </tbody>
                 </table>
+            </div>
             </div>
         </div>
     );

@@ -27,7 +27,8 @@ export default function Payments() {
     }
 
     return (
-        <div className="container">
+        <div className="container-fluid">
+            <div className="mx-auto" style={{ maxWidth: "820px" }}>
             <div className="d-flex flex-row justify-content-between align-items-center mb-4">
                 <h1 className="pb-2">Payments</h1>
                 <button type="button" className="btn btn-primary">Add Payment</button>
@@ -78,6 +79,7 @@ export default function Payments() {
                     })}
                     <button className="btn btn-outline-secondary" disabled={currentPage === totalPages} onClick={() => goToPage(currentPage + 1)}>Next</button>
                 </div>
+            </div>
             </div>
         </div>
     );
