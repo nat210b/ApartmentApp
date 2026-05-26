@@ -30,16 +30,32 @@ export const createVehicle = async (vehicle: CreateVehicleInput): Promise<Vehicl
     throw userError;
   }
 
+  const vehicleWithCreator = {
+    ...vehicle,
+    Created_by: vehicle.Created_by ?? userData.user?.id,
+  };
   const { data, error } = await supabase
     .from("Vehicles")
-    .insert({
-      ...vehicle,
-      Created_by: vehicle.Created_by ?? userData.user?.id,
-    })
+    .insert(vehicleWithCreator)
     .select(vehicleSelect)
     .single();
 
   if (error) {
+    if (error.code === "PGRST204" && error.message.includes("Created_by")) {
+      const { Created_by: _createdBy, ...vehicleWithoutCreator } = vehicleWithCreator;
+      const retryResult = await supabase
+        .from("Vehicles")
+        .insert(vehicleWithoutCreator)
+        .select(vehicleSelect)
+        .single();
+
+      if (retryResult.error) {
+        throw retryResult.error;
+      }
+
+      return retryResult.data;
+    }
+
     throw error;
   }
 
@@ -50,10 +66,11 @@ export const updateVehicle = async (
   id: number,
   vehicle: UpdateVehicleInput,
 ): Promise<Vehicle> => {
+  const { Created_by: _createdBy, ...vehicleInput } = vehicle;
   const { data, error } = await supabase
     .from("Vehicles")
     .update({
-      ...vehicle,
+      ...vehicleInput,
       Updated_at: new Date().toISOString(),
     })
     .eq("ID", id)

@@ -5,6 +5,7 @@ export type Vehicle = {
   ID?: number;
   Created_at?: string;
   Updated_at?: string;
+  Plate: string;
   Brand: string;
   Model: string;
   Year: number;

@@ -6,6 +6,7 @@ import type { CreateVehicleInput, UpdateVehicleInput } from "../../services/vehi
 import { getVehicleModelsByBrand, vehicleBrandCategories, vehicleBrands } from "../../data/vehicleBrands";
 
 type VehicleFormValues = {
+    Plate: string;
     Brand: string;
     Model: string;
     Year: string;
@@ -23,6 +24,7 @@ type VehicleFormProps = {
 };
 
 const initialValues: VehicleFormValues = {
+    Plate: "",
     Brand: "",
     Model: "",
     Year: "",
@@ -49,6 +51,7 @@ export default function VehicleForm({
         }
 
         setFormValues({
+            Plate: vehicle.Plate ?? "",
             Brand: vehicle.Brand,
             Model: vehicle.Model,
             Year: String(vehicle.Year ?? ""),
@@ -72,12 +75,12 @@ export default function VehicleForm({
         e.preventDefault();
 
         await onSubmit({
+            Plate: formValues.Plate.trim().toUpperCase(),
             Brand: formValues.Brand.trim(),
             Model: formValues.Model.trim(),
             Year: Number(formValues.Year),
             Owner_ID: Number(formValues.Owner_ID),
             Room_ID: Number(formValues.Room_ID),
-            Created_by: vehicle?.Created_by,
         });
     }
 
@@ -89,6 +92,19 @@ export default function VehicleForm({
             </div>
 
             <div className="modal-body">
+                <div className="mb-3">
+                    <label htmlFor="vehiclePlate" className="form-label">License Plate</label>
+                    <input
+                        id="vehiclePlate"
+                        name="Plate"
+                        type="text"
+                        className="form-control text-uppercase"
+                        value={formValues.Plate}
+                        onChange={handleInputChange}
+                        required
+                    />
+                </div>
+
                 <div className="row">
                     <div className="col-md-6 mb-3">
                         <label htmlFor="vehicleBrand" className="form-label">Brand</label>

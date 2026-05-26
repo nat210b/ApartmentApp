@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { Stepper } from "../../components/stepper/Stepper";
 import type { Tenant } from "../../schemas/Tenant";
 import type {
@@ -111,6 +111,74 @@ function splitPhoneNumber(phone: number | undefined, phoneCodeOptions: PhoneCode
     };
 }
 
+function parseTenantAddress(address: string | undefined, provinces: ThaiProvince[]) {
+    const fallbackAddress = {
+        AddressLine: address ?? "",
+        ProvinceId: "",
+        DistrictId: "",
+        SubDistrictId: "",
+        Postcode: "",
+    };
+
+    if (!address || provinces.length === 0) {
+        return fallbackAddress;
+    }
+
+    const addressParts = address
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+
+    if (addressParts.length < 4) {
+        return fallbackAddress;
+    }
+
+    const postcodePart = addressParts[addressParts.length - 1];
+    const provincePart = addressParts[addressParts.length - 2];
+    const districtPart = addressParts[addressParts.length - 3];
+    const subDistrictPart = addressParts[addressParts.length - 4];
+    const addressLineParts = addressParts.slice(0, -4);
+
+    const province = provinces.find(
+        (currentProvince) =>
+            currentProvince.name_th === provincePart ||
+            currentProvince.name_en.toLowerCase() === provincePart.toLowerCase(),
+    );
+
+    if (!province) {
+        return fallbackAddress;
+    }
+
+    const district = province.districts.find(
+        (currentDistrict) =>
+            currentDistrict.name_th === districtPart ||
+            currentDistrict.name_en.toLowerCase() === districtPart.toLowerCase(),
+    );
+
+    if (!district) {
+        return {
+            ...fallbackAddress,
+            AddressLine: addressLineParts.length > 0 ? addressLineParts.join(", ") : address,
+            ProvinceId: String(province.id),
+            Postcode: /^\d{5}$/.test(postcodePart) ? postcodePart : "",
+        };
+    }
+
+    const subDistrict = district.sub_districts.find(
+        (currentSubDistrict) =>
+            currentSubDistrict.name_th === subDistrictPart ||
+            currentSubDistrict.name_en.toLowerCase() === subDistrictPart.toLowerCase(),
+    );
+
+    return {
+        AddressLine: addressLineParts.length > 0 ? addressLineParts.join(", ") : "",
+        ProvinceId: String(province.id),
+        DistrictId: String(district.id),
+        SubDistrictId: subDistrict ? String(subDistrict.id) : "",
+        Postcode: subDistrict ? String(subDistrict.zip_code) : /^\d{5}$/.test(postcodePart) ? postcodePart : "",
+    };
+}
+
 export function TenantForm({
     tenant,
     saving = false,
@@ -123,6 +191,7 @@ export function TenantForm({
     const [phoneCodes, setPhoneCodes] = useState<PhoneCode[]>(fallbackPhoneCodes);
     const [loadingProvinces, setLoadingProvinces] = useState(false);
     const [provinceError, setProvinceError] = useState("");
+    const previousTenantIdRef = useRef<number | undefined>(undefined);
     const isEdit = Boolean(tenant?.ID);
 
     const selectedProvince = provinces.find(
@@ -211,30 +280,40 @@ export function TenantForm({
     }, []);
 
     useEffect(() => {
+        const tenantId = tenant?.ID;
+        const isDifferentTenant = previousTenantIdRef.current !== tenantId;
+        previousTenantIdRef.current = tenantId;
+
         if (!tenant) {
-            setFormValues(initialValues);
-            setCurrentStep(1);
+            if (isDifferentTenant) {
+                setFormValues(initialValues);
+                setCurrentStep(1);
+            }
             return;
         }
 
         const phoneParts = splitPhoneNumber(tenant.Phone, phoneCodes);
+        const addressParts = parseTenantAddress(tenant.Address, provinces);
 
         setFormValues({
             Firstname: tenant.Firstname,
             Lastname: tenant.Lastname,
             DOB: tenant.DOB,
             ID_card: String(tenant.ID_card ?? ""),
-            AddressLine: tenant.Address,
-            ProvinceId: "",
-            DistrictId: "",
-            SubDistrictId: "",
-            Postcode: "",
+            AddressLine: addressParts.AddressLine,
+            ProvinceId: addressParts.ProvinceId,
+            DistrictId: addressParts.DistrictId,
+            SubDistrictId: addressParts.SubDistrictId,
+            Postcode: addressParts.Postcode,
             Email: tenant.Email,
             PhonePrefix: phoneParts.prefix,
             Phone: phoneParts.number,
         });
-        setCurrentStep(1);
-    }, [phoneCodes, tenant]);
+
+        if (isDifferentTenant) {
+            setCurrentStep(1);
+        }
+    }, [phoneCodes, provinces, tenant]);
 
     function handleInputChange(
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -306,6 +385,9 @@ export function TenantForm({
     }
 
     function goToAddressStep(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault();
+        e.stopPropagation();
+
         const form = e.currentTarget.form;
         validatePersonalStep(form);
     }
@@ -348,6 +430,11 @@ export function TenantForm({
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        if (currentStep === 1) {
+            validatePersonalStep(e.currentTarget);
+            return;
+        }
 
         await onSubmit({
             Firstname: formValues.Firstname.trim(),
@@ -569,6 +656,7 @@ export function TenantForm({
                                     type="text"
                                     className="form-control"
                                     value={formValues.Postcode}
+                                    readOnly
                                     required
                                 />
                             </div>

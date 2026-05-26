@@ -1,0 +1,17 @@
+export const maintenanceIssues = [
+  "Air Conditioner",
+  "Electrical",
+  "Lighting",
+  "Plumbing",
+  "Water Leak",
+  "Bathroom",
+  "Door Lock",
+  "Window",
+  "Furniture",
+  "Appliance",
+  "Internet",
+  "Pest Control",
+  "Cleaning",
+  "Common Area",
+  "Other",
+];

@@ -147,6 +147,7 @@ export default function Vehicles() {
                     <table className="table mb-0">
                         <thead className="bg-secondary text-white">
                             <tr className="text-center">
+                                <th>Plate</th>
                                 <th>Brand</th>
                                 <th>Model</th>
                                 <th>Year</th>
@@ -158,19 +159,20 @@ export default function Vehicles() {
                         <tbody>
                             {loading ? (
                                 <tr className="text-center">
-                                    <td colSpan={6} className="py-4 text-muted">
+                                    <td colSpan={7} className="py-4 text-muted">
                                         Loading vehicles...
                                     </td>
                                 </tr>
                             ) : errorMessage ? (
                                 <tr className="text-center">
-                                    <td colSpan={6} className="py-4 text-danger">
+                                    <td colSpan={7} className="py-4 text-danger">
                                         {errorMessage}
                                     </td>
                                 </tr>
                             ) : visibleVehicles.length > 0 ? (
                                 visibleVehicles.map((vehicle) => (
                                     <tr className="text-center" key={vehicle.ID}>
+                                        <td>{vehicle.Plate}</td>
                                         <td>{vehicle.Brand}</td>
                                         <td>{vehicle.Model}</td>
                                         <td>{vehicle.Year}</td>
@@ -203,7 +205,7 @@ export default function Vehicles() {
                                 ))
                             ) : (
                                 <tr className="text-center">
-                                    <td colSpan={6} className="py-4 text-muted">
+                                    <td colSpan={7} className="py-4 text-muted">
                                         No vehicles found.
                                     </td>
                                 </tr>
